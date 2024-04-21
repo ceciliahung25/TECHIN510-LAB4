@@ -1,4 +1,3 @@
-import time
 import psycopg2
 
 class Database:
@@ -6,30 +5,28 @@ class Database:
         self.con = psycopg2.connect(database_url)
         self.cur = self.con.cursor()
 
-    def create_table(self):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.con.close()
+
+    def create_books_table(self):
         q = """
-        CREATE TABLE IF NOT EXISTS quotes (
+        CREATE TABLE IF NOT EXISTS books (
             id SERIAL PRIMARY KEY,
-            content TEXT NOT NULL,
-            author TEXT NOT NULL,
-            tags TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            price TEXT NOT NULL,
+            rating TEXT NOT NULL
         );
         """
         self.cur.execute(q)
         self.con.commit()
 
-    def truncate_table(self):
+    def insert_book(self, book):
         q = """
-        TRUNCATE TABLE quotes
+        INSERT INTO books (title, description, price, rating) VALUES (%s, %s, %s, %s)
         """
-        self.cur.execute(q)
-        self.con.commit()
-    
-    def insert_quote(self, quote):
-        q = """
-        INSERT INTO quotes (content, author, tags) VALUES (%s, %s, %s)
-        """
-        self.cur.execute(q, (quote['content'], quote['author'], quote['tags'],))
+        self.cur.execute(q, (book['title'], book['description'], book['price'], book['rating']))
         self.con.commit()
