@@ -25,7 +25,9 @@ class Database:
         self.con.close()
 
     def fetch_books(self, search_query, rating_filter, order_by):
-        query = f"SELECT * FROM books WHERE title ILIKE '%{search_query}%' OR description ILIKE '%{search_query}%'"
+        query = "SELECT * FROM books WHERE 1=1"
+        if search_query:
+            query += f" AND (title ILIKE '%{search_query}%' OR description ILIKE '%{search_query}%')"
         if rating_filter:
             query += f" AND rating = {rating_filter}"
         if order_by:
@@ -44,8 +46,7 @@ def main():
 
     if st.button('Fetch Books'):
         with Database(DATABASE_URL) as db:
-        
-            books = db.fetch_books(search_query, rating_filter, order_by if order_by else None)
+            books = db.fetch_books(search_query, rating_filter, order_by)
             if books.empty:
                 st.write("No books found. Please refine your search criteria.")
             else:
@@ -54,4 +55,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
