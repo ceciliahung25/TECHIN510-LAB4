@@ -1,16 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin  # Import the urljoin function
+from urllib.parse import urljoin
 from db import Database
 import os
 
-def scrape_books():
-    base_url = 'http://books.toscrape.com/catalogue/'
-    start_url = 'page-1.html'
-    next_url = start_url
-
 def convert_rating_to_number(rating_word):
-    # Mapping of rating words to numerical values
     rating_map = {
         'One': 1,
         'Two': 2,
@@ -18,16 +12,19 @@ def convert_rating_to_number(rating_word):
         'Four': 4,
         'Five': 5
     }
-    # Return the corresponding numerical value for the rating word
     return rating_map.get(rating_word)
 
+def scrape_books():
+    base_url = 'http://books.toscrape.com/catalogue/'
+    start_url = 'page-1.html'
+    next_url = start_url
 
     # Initialize the database and ensure the table exists
     with Database(os.getenv('DATABASE_URL')) as db:
         db.create_books_table()  # Create the table if it doesn't exist
 
         while next_url:
-            full_url = urljoin(base_url, next_url)  # Use the urljoin function here
+            full_url = urljoin(base_url, next_url)
             response = requests.get(full_url)
             soup = BeautifulSoup(response.content, 'html.parser')
             articles = soup.find_all('article', class_='product_pod')
@@ -35,9 +32,9 @@ def convert_rating_to_number(rating_word):
             for article in articles:
                 title = article.find('h3').find('a')['title']
                 price_text = article.find('p', class_='price_color').text
-                price = float(price_text[1:])  # Convert price to float after removing the currency symbol
+                price = float(price_text[1:])
                 rating_word = article.find('p', class_='star-rating')['class'][1]
-                rating = convert_rating_to_number(rating_word)  # Function to convert rating word to integer
+                rating = convert_rating_to_number(rating_word)
                 link = article.find('h3').find('a')['href']
                 details_url = urljoin(full_url, link)
                 details_response = requests.get(details_url)
@@ -58,4 +55,5 @@ def convert_rating_to_number(rating_word):
 
 if __name__ == '__main__':
     scrape_books()
+
 

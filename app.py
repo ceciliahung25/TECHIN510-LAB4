@@ -24,12 +24,14 @@ class Database:
         self.cur.close()
         self.con.close()
 
-    def fetch_books(self, search_query="", rating_filter=None, order_by=""):
+    def fetch_books(self, search_query, rating_filter, order_by):
         query = f"SELECT * FROM books WHERE title ILIKE '%{search_query}%' OR description ILIKE '%{search_query}%'"
         if rating_filter:
             query += f" AND rating = {rating_filter}"
         if order_by:
-            query += f" ORDER BY {order_by}"
+            query += f" ORDER BY {order_by}"        
+        print(query)
+
         self.cur.execute(query)
         rows = self.cur.fetchall()
         return pd.DataFrame(rows, columns=['id', 'title', 'description', 'price', 'rating'])
@@ -42,6 +44,7 @@ def main():
 
     if st.button('Fetch Books'):
         with Database(DATABASE_URL) as db:
+        
             books = db.fetch_books(search_query, rating_filter, order_by if order_by else None)
             if books.empty:
                 st.write("No books found. Please refine your search criteria.")
