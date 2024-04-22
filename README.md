@@ -3,16 +3,6 @@
 ## Goal
 Create a Python-based web scraper to collect book data from [Books to Scrape](http://books.toscrape.com/), store the data in a PostgreSQL database, and build a Streamlit application to query and interactively filter the data.
 
-### Part A
-
-1. **Web Scraper**:
-   - Scrape book data from the specified URL.
-2. **Database Integration**:
-   - Store scraped data in a PostgreSQL database.
-3. **Streamlit Application**:
-   - Create an interface to search by book name or description.
-   - Add functionality to filter and order by book rating and price.
-
 ## Getting Started
 To set up this project locally, follow these installation steps:
 
